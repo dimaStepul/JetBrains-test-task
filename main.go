@@ -10,6 +10,10 @@ import (
 	"path/filepath"
 )
 
+var directoryPath = "./files"
+
+const filePermission = 0755
+
 type App struct {
 	fileStoragePath string
 }
@@ -139,23 +143,27 @@ func (app *App) welcomeHandler(responseWriter http.ResponseWriter, request *http
 		http.Error(responseWriter, "Failed to response", http.StatusInternalServerError)
 	}
 }
-
 func main() {
-	fileStoragePath := "./files"
-
-	if err := os.MkdirAll(fileStoragePath, 0755); err != nil {
+	if err := os.MkdirAll(directoryPath, filePermission); err != nil {
 		log.Fatalf("Failed to create the directory: %v", err)
 	}
 
-	app := NewApp(fileStoragePath)
+	app := NewApp(directoryPath)
 
 	http.HandleFunc("/", app.welcomeHandler)
 	http.HandleFunc("/save/", app.saveFileHandler)
 	http.HandleFunc("/serve/", app.serveFileHandler)
 	http.HandleFunc("/delete/", app.deleteFileHandler)
 
-	fmt.Println("File server is running on localhost:9999")
-	err := http.ListenAndServe("localhost:9999", nil)
+	httpPort := os.Getenv("PORT")
+	if httpPort == "" {
+		httpPort = "9999"
+	}
+
+	err := http.ListenAndServe("localhost:"+httpPort, nil)
+
+	fmt.Printf("File server is running on localhost:%s\n", httpPort)
+
 	if err != nil {
 		log.Fatalf("Failed to start HTTP server: %v", err)
 	}
