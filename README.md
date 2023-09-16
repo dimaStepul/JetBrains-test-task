@@ -12,7 +12,7 @@ docker run -d -p 9999:9999 --name file-server-container file-server
 curl -X POST -F "file=@newTest.txt" http://localhost:9999/save/path/newTest.txt
 
 # serve method
-curl http://localhost:9999/path/newTest.txt --output aabaa.txt
+curl http://localhost:9999/serve/path/newTest.txt --output privet.txt
 
 # delete method
 curl -X DELETE http://localhost:9999/delete/path/newTest.txt
