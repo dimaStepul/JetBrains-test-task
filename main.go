@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 var directoryPath = "./files"
@@ -154,15 +155,18 @@ func main() {
 	http.HandleFunc("/save/", app.saveFileHandler)
 	http.HandleFunc("/serve/", app.serveFileHandler)
 	http.HandleFunc("/delete/", app.deleteFileHandler)
-
-	httpPort := os.Getenv("PORT")
-	if httpPort == "" {
-		httpPort = "9999"
+	
+	httpPort, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		fmt.Println("Can't convert from string to int ")
 	}
+	if httpPort == 0 {
+		httpPort = 9999
+	}
+	
+	fmt.Println("File server is running")
 
-	err := http.ListenAndServe("localhost:"+httpPort, nil)
-
-	fmt.Printf("File server is running on localhost:%s\n", httpPort)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", httpPort), nil)
 
 	if err != nil {
 		log.Fatalf("Failed to start HTTP server: %v", err)
